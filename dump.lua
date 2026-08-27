@@ -9,13 +9,11 @@ Library.__index = Library
 function Library.new(titleText)
 	local self = setmetatable({}, Library)
 	
-	-- Main ScreenGui
 	self.ScreenGui = Instance.new("ScreenGui")
 	self.ScreenGui.Name = "SeereStyleUI"
 	self.ScreenGui.ResetOnSpawn = false
 	self.ScreenGui.IgnoreGuiInset = true
 	
-	-- Protect GUI if running in an executor environment
 	if syn and syn.protect_gui then
 		syn.protect_gui(self.ScreenGui)
 		self.ScreenGui.Parent = CoreGui
@@ -25,7 +23,6 @@ function Library.new(titleText)
 		self.ScreenGui.Parent = CoreGui
 	end
 
-	-- Main Window Frame
 	self.MainFrame = Instance.new("Frame")
 	self.MainFrame.Name = "MainFrame"
 	self.MainFrame.Size = UDim2.new(0, 650, 0, 520)
@@ -35,14 +32,12 @@ function Library.new(titleText)
 	self.MainFrame.BorderColor3 = Color3.fromRGB(40, 40, 40)
 	self.MainFrame.Parent = self.ScreenGui
 
-	-- Accent Line (Top border accent matching the theme)
 	self.TopAccent = Instance.new("Frame")
 	self.TopAccent.Size = UDim2.new(1, 0, 0, 2)
-	self.TopAccent.BackgroundColor3 = Color3.fromRGB(214, 112, 214) -- Pink accent
+	self.TopAccent.BackgroundColor3 = Color3.fromRGB(214, 112, 214)
 	self.TopAccent.BorderSizePixel = 0
 	self.TopAccent.Parent = self.MainFrame
 
-	-- Top Title Bar
 	self.TitleBar = Instance.new("TextLabel")
 	self.TitleBar.Size = UDim2.new(1, -10, 0, 25)
 	self.TitleBar.Position = UDim2.new(0, 8, 0, 4)
@@ -54,7 +49,6 @@ function Library.new(titleText)
 	self.TitleBar.TextXAlignment = Enum.TextXAlignment.Left
 	self.TitleBar.Parent = self.MainFrame
 
-	-- Tab Container Bar
 	self.TabContainer = Instance.new("Frame")
 	self.TabContainer.Size = UDim2.new(1, -16, 0, 28)
 	self.TabContainer.Position = UDim2.new(0, 8, 0, 32)
@@ -72,8 +66,7 @@ function Library.new(titleText)
 	self.ContentHolder.Name = "Tabs"
 	self.ContentHolder.Parent = self.MainFrame
 
-	-- Dragging Logic
-	local dragging, dragInput, dragStart, startPos
+	local dragging, dragStart, startPos
 	self.TitleBar.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = true
@@ -104,7 +97,6 @@ end
 function Library:AddTab(name)
 	local tab = {}
 	
-	-- Tab Button
 	local tabButton = Instance.new("TextButton")
 	tabButton.Size = UDim2.new(0, 85, 1, 0)
 	tabButton.BackgroundTransparency = 1
@@ -114,7 +106,6 @@ function Library:AddTab(name)
 	tabButton.Font = Enum.Font.Code
 	tabButton.Parent = self.MainFrame.TabContainer
 
-	-- Tab Page Content Panel
 	local tabPage = Instance.new("ScrollingFrame")
 	tabPage.Size = UDim2.new(1, -16, 1, -75)
 	tabPage.Position = UDim2.new(0, 8, 0, 68)
@@ -131,14 +122,13 @@ function Library:AddTab(name)
 	pageLayout.Padding = UDim.new(0, 8)
 	pageLayout.Parent = tabPage
 
-	-- Switch Tab Logic
 	tabButton.MouseButton1Click:Connect(function()
 		for _, t in pairs(self.Tabs) do
 			t.Page.Visible = false
 			t.Button.TextColor3 = Color3.fromRGB(130, 130, 130)
 		end
 		tabPage.Visible = true
-		tabButton.TextColor3 = Color3.fromRGB(255, 110, 215) -- Active pink color
+		tabButton.TextColor3 = Color3.fromRGB(255, 110, 215)
 	end)
 
 	if #self.Tabs == 0 then
@@ -159,7 +149,6 @@ function Library:AddTab(name)
 		groupFrame.BorderColor3 = Color3.fromRGB(35, 35, 35)
 		groupFrame.Parent = tabPage
 
-		-- Groupbox Title and Border Cutout look
 		local groupTitle = Instance.new("TextLabel")
 		groupTitle.Size = UDim2.new(0, 0, 0, 15)
 		groupTitle.Position = UDim2.new(0, 10, 0, -7)
@@ -175,7 +164,6 @@ function Library:AddTab(name)
 		groupLayout.Padding = UDim.new(0, 6)
 		groupLayout.Parent = groupFrame
 
-		-- Padding helper wrapper for inner elements
 		local padding = Instance.new("UIPadding")
 		padding.PaddingTop = UDim.new(0, 12)
 		padding.PaddingLeft = UDim.new(0, 8)
@@ -199,8 +187,8 @@ function Library:AddTab(name)
 			end)
 		end
 
-		function group:AddToggle(text, callback)
-			local toggled = false
+		function group:AddToggle(text, default, callback)
+			local toggled = default or false
 			local toggleBtn = Instance.new("TextButton")
 			toggleBtn.Size = UDim2.new(1, 0, 0, 20)
 			toggleBtn.BackgroundTransparency = 1
@@ -210,7 +198,7 @@ function Library:AddTab(name)
 			local box = Instance.new("Frame")
 			box.Size = UDim2.new(0, 12, 0, 12)
 			box.Position = UDim2.new(0, 0, 0.5, -6)
-			box.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+			box.BackgroundColor3 = toggled and Color3.fromRGB(214, 112, 214) or Color3.fromRGB(22, 22, 22)
 			box.BorderSizePixel = 1
 			box.BorderColor3 = Color3.fromRGB(50, 50, 50)
 			box.Parent = toggleBtn
@@ -231,6 +219,71 @@ function Library:AddTab(name)
 				box.BackgroundColor3 = toggled and Color3.fromRGB(214, 112, 214) or Color3.fromRGB(22, 22, 22)
 				pcall(callback, toggled)
 			end)
+		end
+
+		function group:AddTextBox(text, default, callback)
+			local container = Instance.new("Frame")
+			container.Size = UDim2.new(1, 0, 0, 38)
+			container.BackgroundTransparency = 1
+			container.Parent = groupFrame
+
+			local label = Instance.new("TextLabel")
+			label.Size = UDim2.new(1, 0, 0, 14)
+			label.BackgroundTransparency = 1
+			label.Text = text
+			label.TextColor3 = Color3.fromRGB(160, 160, 160)
+			label.TextSize = 11
+			label.Font = Enum.Font.Code
+			label.TextXAlignment = Enum.TextXAlignment.Left
+			label.Parent = container
+
+			local box = Instance.new("TextBox")
+			box.Size = UDim2.new(1, 0, 0, 20)
+			box.Position = UDim2.new(0, 0, 0, 16)
+			box.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+			box.BorderSizePixel = 1
+			box.BorderColor3 = Color3.fromRGB(40, 40, 40)
+			box.Text = default or ""
+			box.TextColor3 = Color3.fromRGB(200, 200, 200)
+			box.TextSize = 11
+			box.Font = Enum.Font.Code
+			box.ClearTextOnFocus = false
+			box.Parent = container
+
+			box.FocusLost:Connect(function(enterPressed)
+				pcall(callback, box.Text)
+			end)
+		end
+
+		function group:AddListbox(items, callback)
+			local listFrame = Instance.new("ScrollingFrame")
+			listFrame.Size = UDim2.new(1, 0, 0, 110)
+			listFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+			listFrame.BorderSizePixel = 1
+			listFrame.BorderColor3 = Color3.fromRGB(40, 40, 40)
+			listFrame.CanvasSize = UDim2.new(0, 0, 0, #items * 18)
+			listFrame.ScrollBarThickness = 2
+			listFrame.Parent = groupFrame
+
+			local listLayout = Instance.new("UIListLayout")
+			listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			listLayout.Parent = listFrame
+
+			for _, item in ipairs(items) do
+				local itemBtn = Instance.new("TextButton")
+				itemBtn.Size = UDim2.new(1, 0, 0, 18)
+				itemBtn.BackgroundTransparency = 1
+				itemBtn.Text = " " .. item
+				itemBtn.TextColor3 = Color3.fromRGB(160, 160, 160)
+				itemBtn.TextSize = 11
+				itemBtn.Font = Enum.Font.Code
+				itemBtn.TextXAlignment = Enum.TextXAlignment.Left
+				itemBtn.Parent = listFrame
+
+				itemBtn.MouseButton1Click:Connect(function()
+					pcall(callback, item)
+				end)
+			end
 		end
 
 		return group

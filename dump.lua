@@ -50,6 +50,7 @@ function Library.new(titleText)
 	self.TitleBar.Parent = self.MainFrame
 
 	self.TabContainer = Instance.new("Frame")
+	self.TabContainer.Name = "TabContainer"
 	self.TabContainer.Size = UDim2.new(1, -16, 0, 28)
 	self.TabContainer.Position = UDim2.new(0, 8, 0, 32)
 	self.TabContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
@@ -291,5 +292,3 @@ function Library:AddTab(name)
 
 	return tab
 end
-
-return Library
